@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ZainRecharge.Api/ZainRecharge.Api.csproj" />
+    <Project Path="src/ZainRecharge.Application/ZainRecharge.Application.csproj" />
+    <Project Path="src/ZainRecharge.Domain/ZainRecharge.Domain.csproj" />
+    <Project Path="src/ZainRecharge.Infrastructure/ZainRecharge.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ZainRecharge.Tests/ZainRecharge.Tests.csproj" />
+  </Folder>
+</Solution>
