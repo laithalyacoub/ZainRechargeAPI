@@ -1,0 +1,1190 @@
+{
+  "info": {
+    "_postman_id": "934aadeb-5f78-40cf-acbd-f55cebb8961e",
+    "name": "Zain Recharge and Mock Payment Provider",
+    "description": "Fake development values only. Safe to share.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 Mandatory scenarios",
+      "item": [
+        {
+          "name": "01 Recharge 5 JOD (expect 201 SUCCESS)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"mobileNumber\": \"0791234567\", \"amount\": 5}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"transaction id came from the system\", () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.transactionId).to.match(/^TXN-\\d+$/);",
+                  "  pm.expect(body.status).to.eql(\"SUCCESS\");",
+                  "  pm.expect(body.paymentReference).to.match(/^PAY-\\d+$/);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 Recharge 25 JOD (expect 200 FAILED)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"mobileNumber\": \"0791234567\", \"amount\": 25}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"declined: FAILED with a reason\", () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.eql(\"FAILED\");",
+                  "  pm.expect(body.failureReason).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03 Recharge -5 JOD (expect 400, provider not called)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"mobileNumber\": \"0791234567\", \"amount\": -5}"
+            },
+            "description": "Also check Seq: filter Application = 'MockPaymentProvider' and confirm no new line appeared for this request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"error is on amount\", () => pm.expect(pm.response.json().errors).to.have.property(\"amount\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "04 Provider outage number 0790000000 (expect 503 + Retry-After)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"mobileNumber\": \"0790000000\", \"amount\": 5}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"503\", () => pm.response.to.have.status(503));",
+                  "pm.test(\"Retry-After header present\", () => pm.response.to.have.header(\"Retry-After\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05 Provider slow number 0799999999 (expect 202 UNKNOWN after about 5 s)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"mobileNumber\": \"0799999999\", \"amount\": 5}"
+            },
+            "description": "Zain gives up after 5 seconds; the provider takes 10 seconds. Run scenario 04 or a normal recharge afterwards."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"202\", () => pm.response.to.have.status(202));",
+                  "pm.test(\"status is UNKNOWN\", () => pm.expect(pm.response.json().status).to.eql(\"UNKNOWN\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "06 History, page 1, size 2 (newest first)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge/history/0791234567?page=1&pageSize=2"
+            },
+            "description": "Run a few recharges first. Then try page=2&pageSize=2 and compare totalCount."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"paged answer\", () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.items).to.be.an(\"array\");",
+                  "  pm.expect(body.totalCount).to.be.at.least(body.items.length);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Rows 1 to 6 of section 15. Start Seq, the provider (5100) and Zain (5200) first."
+    },
+    {
+      "name": "02 Trainer requirements",
+      "item": [
+        {
+          "name": "07 Number with 00962 prefix (expect 201, stored as 0791234567)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"mobileNumber\": \"00962791234567\", \"amount\": 5}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"cleaned number\", () => pm.expect(pm.response.json().mobileNumber).to.eql(\"0791234567\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "08a Number with +962 prefix",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"mobileNumber\": \"+962791234567\", \"amount\": 5}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"cleaned number\", () => pm.expect(pm.response.json().mobileNumber).to.eql(\"0791234567\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "08b Number with spaces",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"mobileNumber\": \"079 123 4567\", \"amount\": 5}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"cleaned number\", () => pm.expect(pm.response.json().mobileNumber).to.eql(\"0791234567\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "09 Wrong prefix 0701234567 (expect 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"mobileNumber\": \"0701234567\", \"amount\": 5}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"error is on mobileNumber\", () => pm.expect(pm.response.json().errors).to.have.property(\"mobileNumber\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "10 Caller tries to choose the id (expect 201, id still generated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"transactionId\": \"TXN-9\", \"mobileNumber\": \"0791234567\", \"amount\": 1}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"id is not the one sent\", () => pm.expect(pm.response.json().transactionId).to.not.eql(\"TXN-9\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11 Ids count up by themselves (send twice, compare)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"mobileNumber\": \"0791234567\", \"amount\": 1}"
+            },
+            "description": "Press Send twice. The second transactionId must be higher. Scenario 12 (ten at once) is the PowerShell snippet in section 15 of the guide."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"generated id\", () => pm.expect(pm.response.json().transactionId).to.match(/^TXN-\\d+$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "13a Plain text body (expect 415)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "text/plain"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "hello"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"415\", () => pm.response.to.have.status(415));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "13b Broken JSON (expect 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ broken"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "13c Empty body (expect 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "14a Lookup unknown id 99999 (expect 404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge/99999"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "14b Lookup id 0 (expect 400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge/0"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "14c Lookup id -1 (expect 400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge/-1"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "14d Lookup id abc (expect 404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge/abc"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "15a History with invalid number (expect 400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge/history/0701234567"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "15b History pageSize 1000 (expect 400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge/history/0791234567?pageSize=1000"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "15c History of a valid number with no rows (expect 200, empty list)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge/history/0780000000"
+            },
+            "description": "Uses 0780000000. A number must start with 077, 078 or 079, so it has to be a valid one that was never used."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"empty list\", () => pm.expect(pm.response.json().items).to.have.lengthOf(0));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Rows 7 to 15: 00962 cleaning, generated ids, wrong bodies, lookups, history edge cases."
+    },
+    {
+      "name": "03 Provider security",
+      "item": [
+        {
+          "name": "16a Token without X-Api-Key (expect 401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{providerUrl}}/api/auth/token"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"clientId\": \"{{clientId}}\", \"clientSecret\": \"{{clientSecret}}\"}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "16b Token with wrong X-Api-Key (expect 401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "wrong-key"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{providerUrl}}/api/auth/token"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"clientId\": \"{{clientId}}\", \"clientSecret\": \"{{clientSecret}}\"}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "17 Right key, wrong clientSecret (expect 401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{providerApiKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{providerUrl}}/api/auth/token"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"clientId\": \"{{clientId}}\", \"clientSecret\": \"wrong-secret\"}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "18 Process without Authorization header (expect 401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{providerApiKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{providerUrl}}/api/payments/process"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"transactionId\": \"TXN-18000\", \"mobileNumber\": \"0791234567\", \"amount\": 5}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "19 Process with a fake token (expect 401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{providerApiKey}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer abc.def.ghi"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{providerUrl}}/api/payments/process"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"transactionId\": \"TXN-19000\", \"mobileNumber\": \"0791234567\", \"amount\": 5}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "21a Process (first time, expect 200)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{providerApiKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{providerUrl}}/api/payments/process"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"transactionId\": \"{{idemId}}\", \"mobileNumber\": \"0791234567\", \"amount\": 5}"
+            },
+            "description": "Scenario 20 (an expired token) is manual: set Security:TokenLifetimeSeconds to 10, wait 11 seconds, then send this request with the old token."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set(\"idemId\", \"TXN-\" + Date.now().toString().slice(-9));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"SUCCESS with reference\", () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.eql(\"SUCCESS\");",
+                  "  pm.environment.set(\"idemRef\", body.paymentReference);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "21b Process again, same id and body (expect 200, same reference)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{providerApiKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{providerUrl}}/api/payments/process"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"transactionId\": \"{{idemId}}\", \"mobileNumber\": \"0791234567\", \"amount\": 5}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"same reference as before\", () => pm.expect(pm.response.json().paymentReference).to.eql(pm.environment.get(\"idemRef\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "22 Same id, different amount (expect 409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{providerApiKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{providerUrl}}/api/payments/process"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"transactionId\": \"{{idemId}}\", \"mobileNumber\": \"0791234567\", \"amount\": 6}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "23a Status inquiry, existing payment (expect 200)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{providerApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{providerUrl}}/api/payments/{{idemId}}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "23b Status inquiry, unknown id (expect 404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{providerApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{providerUrl}}/api/payments/TXN-404404"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Rows 16 to 23. Calls the provider directly. The folder script fetches and refreshes the bearer token.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{accessToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const expiresAt = Number(pm.environment.get(\"tokenExpiresAt\") || 0);",
+              "",
+              "if (Date.now() >= expiresAt) {",
+              "  pm.sendRequest({",
+              "    url: pm.environment.get(\"providerUrl\") + \"/api/auth/token\",",
+              "    method: \"POST\",",
+              "    header: {",
+              "      \"Content-Type\": \"application/json\",",
+              "      \"X-Api-Key\": pm.environment.get(\"providerApiKey\")",
+              "    },",
+              "    body: {",
+              "      mode: \"raw\",",
+              "      raw: JSON.stringify({",
+              "        clientId: pm.environment.get(\"clientId\"),",
+              "        clientSecret: pm.environment.get(\"clientSecret\")",
+              "      })",
+              "    }",
+              "  }, (error, response) => {",
+              "    if (error || response.code !== 200) {",
+              "      console.error(\"Could not get a token\");",
+              "      return;",
+              "    }",
+              "    const body = response.json();",
+              "    pm.environment.set(\"accessToken\", body.accessToken);",
+              "    // renew 30 seconds before it expires, the same rule the Zain API uses",
+              "    pm.environment.set(\"tokenExpiresAt\", Date.now() + (body.expiresInSeconds - 30) * 1000);",
+              "  });",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Failure drills",
+      "item": [
+        {
+          "name": "24 Stop the provider first, then send (expect 503)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"mobileNumber\": \"0791234567\", \"amount\": 5}"
+            },
+            "description": "Stop the provider (Ctrl+C or the stop button). Expect the row FAILED and an Error in Seq: Could not connect to the provider."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"503\", () => pm.response.to.have.status(503));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "25 Wrong ApiKey in Zain settings, restart Zain (expect 503)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"mobileNumber\": \"0791234567\", \"amount\": 5}"
+            },
+            "description": "Put a wrong PaymentProvider:ApiKey in Zain's development settings and restart Zain. Seq shows: The provider answered 401 to the token request. Put the right key back afterwards."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"503\", () => pm.response.to.have.status(503));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "26a Stop the database, then send any recharge (expect 503)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"mobileNumber\": \"0791234567\", \"amount\": 5}"
+            },
+            "description": "Run: sqllocaldb stop MSSQLLocalDB. Start it again with: sqllocaldb start MSSQLLocalDB"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"503\", () => pm.response.to.have.status(503));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "26b Health check with the database stopped (expect 503)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{zainUrl}}/health"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"503\", () => pm.response.to.have.status(503));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "27 Token cache (send many recharges for a minute, then look at Seq)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{zainUrl}}/api/recharge"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"mobileNumber\": \"0791234567\", \"amount\": 1}"
+            },
+            "description": "Set the provider's Security:TokenLifetimeSeconds to 40. In Seq, 'Obtained a provider token' appears about every 10 seconds, not on every request."
+          }
+        }
+      ],
+      "description": "Rows 24 to 27. Break something on purpose first, then send the request. Each description says what to stop."
+    }
+  ]
+}

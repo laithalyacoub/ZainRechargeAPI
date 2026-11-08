@@ -7,7 +7,7 @@ public class RechargeRequestValidatorTests
 {
     [Theory]
     [InlineData("0791234567", "0791234567")]
-    [InlineData("00962791234567", "0791234567")]   // the trainer's rule
+    [InlineData("00962791234567", "0791234567")]   
     [InlineData("+962791234567", "0791234567")]
     [InlineData("079 123 4567", "0791234567")]
     [InlineData("079-123-4567", "0791234567")]
