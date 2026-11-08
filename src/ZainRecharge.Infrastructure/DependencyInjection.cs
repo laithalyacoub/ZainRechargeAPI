@@ -22,11 +22,15 @@ public static class DependencyInjection
         services.AddScoped<IRechargeRepository, RechargeRepository>();
 
         // The provider: two named clients, one token cache, one client class.
+        services.AddTransient<CorrelationIdHandler>();
+
         services.AddHttpClient(HttpClientNames.Token, (sp, client) =>
-            ConfigureProviderClient(sp, client, o => o.TokenTimeoutSeconds));
+                ConfigureProviderClient(sp, client, o => o.TokenTimeoutSeconds))
+            .AddHttpMessageHandler<CorrelationIdHandler>();
 
         services.AddHttpClient(HttpClientNames.Payment, (sp, client) =>
-            ConfigureProviderClient(sp, client, o => o.PaymentTimeoutSeconds));
+                ConfigureProviderClient(sp, client, o => o.PaymentTimeoutSeconds))
+            .AddHttpMessageHandler<CorrelationIdHandler>();
 
         services.AddSingleton<IProviderTokenProvider, ProviderTokenProvider>(); // holds the cached token
         services.AddScoped<IPaymentProviderClient, PaymentProviderClient>();
