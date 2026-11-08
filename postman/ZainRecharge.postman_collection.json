@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "934aadeb-5f78-40cf-acbd-f55cebb8961e",
+    "_postman_id": "af594b69-16a2-46e4-ae39-be8302441add",
     "name": "Zain Recharge and Mock Payment Provider",
     "description": "Fake development values only. Safe to share.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -20,7 +20,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -56,7 +63,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -91,7 +105,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -123,7 +144,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -154,7 +182,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -181,7 +216,26 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge/history/0791234567?page=1&pageSize=2"
+              "raw": "{{zainUrl}}/api/recharge/history/0791234567?page=1&pageSize=2",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge",
+                "history",
+                "0791234567"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "2"
+                }
+              ]
             },
             "description": "Run a few recharges first. Then try page=2&pageSize=2 and compare totalCount."
           },
@@ -206,7 +260,7 @@
       "description": "Rows 1 to 6 of section 15. Start Seq, the provider (5100) and Zain (5200) first."
     },
     {
-      "name": "02 Trainer requirements",
+      "name": "02 Other requirements",
       "item": [
         {
           "name": "07 Number with 00962 prefix (expect 201, stored as 0791234567)",
@@ -219,7 +273,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -250,7 +311,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -281,7 +349,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -312,7 +387,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -343,7 +425,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -374,7 +463,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -406,7 +502,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -436,7 +539,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -466,7 +576,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -491,7 +608,15 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge/99999"
+              "raw": "{{zainUrl}}/api/recharge/99999",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge",
+                "99999"
+              ]
             }
           },
           "event": [
@@ -512,7 +637,15 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge/0"
+              "raw": "{{zainUrl}}/api/recharge/0",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge",
+                "0"
+              ]
             }
           },
           "event": [
@@ -533,7 +666,15 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge/-1"
+              "raw": "{{zainUrl}}/api/recharge/-1",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge",
+                "-1"
+              ]
             }
           },
           "event": [
@@ -554,7 +695,15 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge/abc"
+              "raw": "{{zainUrl}}/api/recharge/abc",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge",
+                "abc"
+              ]
             }
           },
           "event": [
@@ -575,7 +724,16 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge/history/0701234567"
+              "raw": "{{zainUrl}}/api/recharge/history/0701234567",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge",
+                "history",
+                "0701234567"
+              ]
             }
           },
           "event": [
@@ -596,7 +754,22 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge/history/0791234567?pageSize=1000"
+              "raw": "{{zainUrl}}/api/recharge/history/0791234567?pageSize=1000",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge",
+                "history",
+                "0791234567"
+              ],
+              "query": [
+                {
+                  "key": "pageSize",
+                  "value": "1000"
+                }
+              ]
             }
           },
           "event": [
@@ -617,7 +790,16 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge/history/0780000000"
+              "raw": "{{zainUrl}}/api/recharge/history/0780000000",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge",
+                "history",
+                "0780000000"
+              ]
             },
             "description": "Uses 0780000000. A number must start with 077, 078 or 079, so it has to be a valid one that was never used."
           },
@@ -651,7 +833,15 @@
               }
             ],
             "url": {
-              "raw": "{{providerUrl}}/api/auth/token"
+              "raw": "{{providerUrl}}/api/auth/token",
+              "host": [
+                "{{providerUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "token"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -688,7 +878,15 @@
               }
             ],
             "url": {
-              "raw": "{{providerUrl}}/api/auth/token"
+              "raw": "{{providerUrl}}/api/auth/token",
+              "host": [
+                "{{providerUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "token"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -725,7 +923,15 @@
               }
             ],
             "url": {
-              "raw": "{{providerUrl}}/api/auth/token"
+              "raw": "{{providerUrl}}/api/auth/token",
+              "host": [
+                "{{providerUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "token"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -762,7 +968,15 @@
               }
             ],
             "url": {
-              "raw": "{{providerUrl}}/api/payments/process"
+              "raw": "{{providerUrl}}/api/payments/process",
+              "host": [
+                "{{providerUrl}}"
+              ],
+              "path": [
+                "api",
+                "payments",
+                "process"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -803,7 +1017,15 @@
               }
             ],
             "url": {
-              "raw": "{{providerUrl}}/api/payments/process"
+              "raw": "{{providerUrl}}/api/payments/process",
+              "host": [
+                "{{providerUrl}}"
+              ],
+              "path": [
+                "api",
+                "payments",
+                "process"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -840,7 +1062,15 @@
               }
             ],
             "url": {
-              "raw": "{{providerUrl}}/api/payments/process"
+              "raw": "{{providerUrl}}/api/payments/process",
+              "host": [
+                "{{providerUrl}}"
+              ],
+              "path": [
+                "api",
+                "payments",
+                "process"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -889,7 +1119,15 @@
               }
             ],
             "url": {
-              "raw": "{{providerUrl}}/api/payments/process"
+              "raw": "{{providerUrl}}/api/payments/process",
+              "host": [
+                "{{providerUrl}}"
+              ],
+              "path": [
+                "api",
+                "payments",
+                "process"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -924,7 +1162,15 @@
               }
             ],
             "url": {
-              "raw": "{{providerUrl}}/api/payments/process"
+              "raw": "{{providerUrl}}/api/payments/process",
+              "host": [
+                "{{providerUrl}}"
+              ],
+              "path": [
+                "api",
+                "payments",
+                "process"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -954,7 +1200,15 @@
               }
             ],
             "url": {
-              "raw": "{{providerUrl}}/api/payments/{{idemId}}"
+              "raw": "{{providerUrl}}/api/payments/{{idemId}}",
+              "host": [
+                "{{providerUrl}}"
+              ],
+              "path": [
+                "api",
+                "payments",
+                "{{idemId}}"
+              ]
             }
           },
           "event": [
@@ -980,7 +1234,15 @@
               }
             ],
             "url": {
-              "raw": "{{providerUrl}}/api/payments/TXN-404404"
+              "raw": "{{providerUrl}}/api/payments/TXN-404404",
+              "host": [
+                "{{providerUrl}}"
+              ],
+              "path": [
+                "api",
+                "payments",
+                "TXN-404404"
+              ]
             }
           },
           "event": [
@@ -1060,7 +1322,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1091,7 +1360,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1122,7 +1398,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1148,7 +1431,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{zainUrl}}/health"
+              "raw": "{{zainUrl}}/health",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
             }
           },
           "event": [
@@ -1174,7 +1463,14 @@
               }
             ],
             "url": {
-              "raw": "{{zainUrl}}/api/recharge"
+              "raw": "{{zainUrl}}/api/recharge",
+              "host": [
+                "{{zainUrl}}"
+              ],
+              "path": [
+                "api",
+                "recharge"
+              ]
             },
             "body": {
               "mode": "raw",
