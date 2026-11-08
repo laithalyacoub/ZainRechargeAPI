@@ -1,6 +1,6 @@
 # Evidence
 
-Screenshots of the six mandatory scenarios and of the trainer's extra requirements. Every file name starts with the scenario number.
+Screenshots of the six mandatory scenarios and of the extra requirements. Every file name starts with the scenario number.
 
 | Scenario | File | What it shows |
 |---|---|---|
